@@ -1,0 +1,69 @@
+/* Achin Bindlish — overrides of Prestige core (plain CSS, loaded after theme.scss.css) */
+
+select option {
+  background-color: #33251C;
+  color: #FFF6E4;
+}
+
+/* ShopTheLook light dot: #fff / white -> Ivory (mirror of base .ShopTheLook__Dot) */
+.ShopTheLook__Dot--light {
+  background: #FFF6E4;
+}
+.ShopTheLook__Dot--light::after {
+  background: rgba(255, 246, 228, 0.4);
+}
+
+/* ============================================================
+   Mulish type system — weight & tracking overrides
+   Loaded after theme.scss.css. No font-size changes here.
+   ============================================================ */
+
+/* ---------- Buttons & caps ---------------------------------- */
+/* Each selector equals or exceeds its theme source so load order wins:
+   .Button                                     <- .Button (0,1,0)
+   .Form__Submit                               <- wrapper; control is .Button
+   .ShopTheLook__ViewButton                    <- itself a .Button (0,1,0)
+   .SizeTiles__Legend                          <- .SizeTiles__Legend (0,1,0)
+   .CustomSize__Legend                         <- .CustomSize__Legend (0,1,0)
+   .Table th                                   <- .Table th (0,1,1)
+   .SizeTile                                   <- .SizeTile (0,1,0)
+   .CustomSize__OptionInner                    <- .CustomSize__OptionInner (0,1,0)
+   .Form__Label                                <- .Form__Label (0,1,0)
+   .Select--transparent select                 <- .Select--transparent select (0,1,1)
+   .shopify-challenge__container .shopify-challenge__button
+                                               <- .shopify-challenge__container .shopify-challenge__button (0,2,0)
+   #shopify-product-reviews .spr-review-header-title
+                                               <- #shopify-product-reviews .spr-review-header-title (1,1,0)
+   .Instafeed__Date                            <- .Instafeed__Date (0,1,0) */
+.Button,
+.Form__Submit,
+.ShopTheLook__ViewButton,
+.SizeTiles__Legend,
+.CustomSize__Legend,
+.Table th,
+.SizeTile,
+.CustomSize__OptionInner,
+.Form__Label,
+.Select--transparent select,
+.shopify-challenge__container .shopify-challenge__button,
+#shopify-product-reviews .spr-review-header-title,
+.Instafeed__Date {
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+/* ---------- Navigation -------------------------------------- */
+/* Scoped to each nav container so product accordions, collection filters
+   and non-nav .Heading elements are untouched. (0,2,0) beats .Heading (0,1,0);
+   .MegaMenu__Title (0,1,0) wins by load order. */
+.Header__MainNav .Heading,
+.MegaMenu__Title,
+.SidebarMenu__Nav .Heading {
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+/* ---------- Body -------------------------------------------- */
+body {
+  line-height: 1.7;
+}
