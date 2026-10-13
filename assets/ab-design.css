@@ -77,11 +77,14 @@ strong {
   font-weight: 600;
 }
 
-/* ---------- Display headings (home page only) ----------------- */
-/* Home section headings (.SectionHeader__Heading, rendered as .Heading.u-h1 at 22px).
+/* ---------- Display headings (home + collection header) ------- */
+/* Section headings (.SectionHeader__Heading, rendered as .Heading.u-h1).
    Mobile < 641px: 24px → under-32 rule (400, 0). Tablet and up: 32px → display rule (300, -0.01em).
-   Scoped to body.template-index; (0,2,0) beats .u-h1 size rules. Size set by class, never by tag. */
-.template-index .SectionHeader__Heading {
+   Home scoped to body.template-index; collection header scoped to [data-section-type="collection"]
+   so "Recently viewed" (also .SectionHeader__Heading, a separate section) is untouched.
+   (0,2,0) beats .u-h1 size rules. Size set by class, never by tag. */
+.template-index .SectionHeader__Heading,
+[data-section-type="collection"] .SectionHeader__Heading {
   font-size: 24px;
   font-weight: 400;
   letter-spacing: 0;
@@ -89,10 +92,53 @@ strong {
 }
 
 @media screen and (min-width: 641px) {
-  .template-index .SectionHeader__Heading {
+  .template-index .SectionHeader__Heading,
+  [data-section-type="collection"] .SectionHeader__Heading {
     font-size: 32px;
     font-weight: 300;
     letter-spacing: -0.01em;
+  }
+}
+
+/* ---------- Collection header intro (Description) ------------- */
+/* Editorial intro under the collection title, scoped to the collection section.
+   (0,2,0) beats .SectionHeader__Description (max-width 530px) and the inherited Rte
+   color; margin-auto ties .SectionHeader--center and wins on load order. */
+[data-section-type="collection"] .SectionHeader__Description {
+  color: #B5A493;        /* Sand */
+  line-height: 1.7;
+  max-width: 60ch;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+[data-section-type="collection"] .SectionHeader__Description b,
+[data-section-type="collection"] .SectionHeader__Description strong {
+  color: #FFF6E4;        /* Ivory */
+  font-weight: 600;
+}
+
+/* ---------- Collection header spacing (plain PageHeader) ------ */
+/* Theme hooks reused:
+     above-title / intro->toolbar  = .PageHeader margin (was 35px mobile / 50px tablet, theme.scss.liquid:4827,4913)
+     title -> intro gap            = heading margin-bottom (theme phone 10px @4907, tablet 0)
+   margin-top can't carry the title->intro gap - theme forces heading/description
+   margin-top:0 !important (theme.scss.liquid:4876) - so the gap rides on heading margin-bottom.
+   :not(.PageHeader--withBackground) leaves the image-hero variant untouched. No !important. */
+[data-section-type="collection"] .PageHeader:not(.PageHeader--withBackground) {
+  margin-top: 40px;      /* space above title - mobile */
+  margin-bottom: 32px;   /* intro -> toolbar - mobile */
+}
+
+[data-section-type="collection"] .SectionHeader__Heading {
+  margin-bottom: 18px;   /* title -> intro gap */
+}
+
+@media screen and (min-width: 641px) {
+  [data-section-type="collection"] .PageHeader:not(.PageHeader--withBackground) {
+    margin-top: 70px;    /* space above title - tablet and up */
+    margin-bottom: 56px; /* intro -> toolbar - tablet and up */
   }
 }
 
