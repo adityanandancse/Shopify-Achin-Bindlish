@@ -30,7 +30,11 @@
                 {%- assign linklist = linklists[block.settings.menu] -%}
 
                 {%- if linklist != empty -%}
-                  <h2 class="Footer__Title Heading u-h6">{{ linklist.title | escape }}</h2>
+                  {%- if block.settings.title != blank -%}
+                    <h2 class="Footer__Title Heading u-h6">{{ block.settings.title | escape }}</h2>
+                  {%- else -%}
+                    <h2 class="Footer__Title Heading u-h6">{{ linklist.title | escape }}</h2>
+                  {%- endif -%}
 
                   <ul class="Linklist">
                     {%- for link in linklist.links -%}
@@ -137,6 +141,11 @@
       "type": "links",
       "name": "Links",
       "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading"
+        },
         {
           "type": "link_list",
           "id": "menu",
