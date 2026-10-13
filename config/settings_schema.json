@@ -583,5 +583,107 @@
         "info": "32 x 32px .png recommended"
       }
     ]
+  },
+  {
+    "name": "WhatsApp concierge",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "whatsapp_enable",
+        "label": "Enable WhatsApp concierge",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "whatsapp_phone",
+        "label": "Phone number",
+        "info": "Digits only, including country code (no +, spaces or dashes).",
+        "default": "918287222999"
+      },
+      {
+        "type": "text",
+        "id": "whatsapp_label",
+        "label": "Button label",
+        "default": "Speak to the atelier"
+      },
+      {
+        "type": "textarea",
+        "id": "whatsapp_default_message",
+        "label": "Default message",
+        "info": "Used for the floating concierge button.",
+        "default": "Hello, I'd like to speak with the Achin Bindlish atelier."
+      },
+      {
+        "type": "textarea",
+        "id": "whatsapp_product_message",
+        "label": "Product message",
+        "info": "Used for product enquiry buttons. [title] and [url] are replaced automatically.",
+        "default": "Hello, I'd like to know more about [title] – [url]"
+      },
+      {
+        "type": "select",
+        "id": "whatsapp_position",
+        "label": "Position",
+        "options": [
+          {
+            "value": "bottom-right",
+            "label": "Bottom right"
+          },
+          {
+            "value": "bottom-left",
+            "label": "Bottom left"
+          }
+        ],
+        "default": "bottom-right"
+      },
+      {
+        "type": "checkbox",
+        "id": "whatsapp_show_on_mobile",
+        "label": "Show on mobile",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "whatsapp_show_on_desktop",
+        "label": "Show on desktop",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "whatsapp_hide_on_templates",
+        "label": "Hide on templates",
+        "info": "Comma-separated template names, e.g. cart,checkout.",
+        "default": "cart"
+      }
+    ]
+  },
+  {
+    "name": "Made to measure",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Controls the custom-size form on product pages. The field keys and garment map are edited in snippets/mtm-fields.liquid."
+      },
+      {
+        "type": "text",
+        "id": "men_tag",
+        "label": "Menswear tag",
+        "info": "Products with this tag use the menswear measurement sheet.",
+        "default": "men"
+      },
+      {
+        "type": "text",
+        "id": "women_tag",
+        "label": "Womenswear tag",
+        "info": "Products with this tag use the womenswear measurement sheet.",
+        "default": "women"
+      },
+      {
+        "type": "url",
+        "id": "guide_url",
+        "label": "How-to-measure guide URL",
+        "info": "Optional. When set, each field shows a 'How to measure' link to this page plus #<key>. Leave empty to hide."
+      }
+    ]
   }
 ]

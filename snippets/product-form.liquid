@@ -11,6 +11,32 @@ for size, we use it to display a size chart (if applicable)
 
 {%- assign selected_variant = product.selected_or_first_available_variant -%}
 
+{%- comment -%} Custom-size (made-to-measure) resolution — see snippets/custom-size.liquid {%- endcomment -%}
+{%- assign mtm_size_option_position = 0 -%}
+{%- assign mtm_custom_variant_id = '' -%}
+{%- unless product.has_only_default_variant -%}
+  {%- for option in product.options_with_values -%}
+    {%- assign mtm_dco = option.name | downcase -%}
+    {%- if size_label contains mtm_dco -%}
+      {%- assign mtm_size_option_position = option.position -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endunless -%}
+{%- if mtm_size_option_position > 0 -%}
+  {%- capture mtm_soi -%}option{{ mtm_size_option_position }}{%- endcapture -%}
+  {%- for variant in product.variants -%}
+    {%- assign mtm_sv = variant[mtm_soi] | downcase -%}
+    {%- if mtm_sv == 'custom' -%}
+      {%- assign mtm_custom_variant_id = variant.id -%}
+      {%- break -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+{%- assign mtm_show = false -%}
+{%- if section.settings.show_custom_size and mtm_size_option_position > 0 -%}
+  {%- assign mtm_show = true -%}
+{%- endif -%}
+
 {%- form 'product', product, class: 'ProductForm' -%}
   <div class="ProductForm__Variants">
     {%- unless product.has_only_default_variant -%}
@@ -65,6 +91,9 @@ for size, we use it to display a size chart (if applicable)
                   {{- value | escape -}}
                 </button>
               {%- endfor -%}
+              {%- if mtm_show -%}
+                <button type="button" class="SizeTile SizeTile--custom" data-mtm-tile aria-pressed="false">Custom size</button>
+              {%- endif -%}
             </div>
           {%- endif -%}
           {%- capture popover_html -%}
@@ -251,11 +280,12 @@ for size, we use it to display a size chart (if applicable)
   --------------------------------------------------------------------------------------------------------------------
   {%- endcomment -%}
     {%- if is_por -%}
-    <a href="#product-enquiry" class="ProductForm__Enquire Button Button--primary Button--full">
+    {%- capture wa_enquire_href -%}{% render 'whatsapp-link', product: product %}{%- endcapture -%}
+    <a href="{{ wa_enquire_href | strip }}" target="_blank" rel="noopener" class="ProductForm__Enquire Button Button--primary Button--full">
       {{- 'product.form.enquire' | t -}}
     </a>
   {%- else -%}
-    {%- include 'custom-size' -%}
+    {%- if mtm_show -%}{%- include 'custom-size' -%}{%- endif -%}
     <button type="submit" class="ProductForm__AddToCart Button {% if selected_variant.available and section.settings.show_payment_button == false %}Button--primary{% else %}Button--secondary{% endif %} Button--full" {% if selected_variant.available %}data-action="add-to-cart"{% else %}disabled="disabled"{% endif %}>
       {%- if selected_variant.available -%}
         <span>{% if product.template_suffix == 'pre-order' %}{{ 'product.form.pre_order' | t }}{% else %}{{ 'product.form.add_to_cart' | t }}{% endif %}</span>

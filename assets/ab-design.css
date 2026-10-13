@@ -69,3 +69,181 @@ select option {
 body {
   line-height: 1.7;
 }
+
+/* ---------- Bold ---------------------------------------------- */
+/* Mulish's uniform stroke reads heavy at 700; theme base is b, strong { font-weight: bold } at theme.scss.liquid:179 (0,0,1) — equal selector wins by load order. */
+b,
+strong {
+  font-weight: 600;
+}
+
+/* ---------- Display headings (home page only) ----------------- */
+/* Home section headings (.SectionHeader__Heading, rendered as .Heading.u-h1 at 22px).
+   Mobile < 641px: 24px → under-32 rule (400, 0). Tablet and up: 32px → display rule (300, -0.01em).
+   Scoped to body.template-index; (0,2,0) beats .u-h1 size rules. Size set by class, never by tag. */
+.template-index .SectionHeader__Heading {
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.2;
+}
+
+@media screen and (min-width: 641px) {
+  .template-index .SectionHeader__Heading {
+    font-size: 32px;
+    font-weight: 300;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* ---------- Collection toolbar + filter popover --------------- */
+/* Filter (left) / Sort (right) at every breakpoint. The theme reverses
+   .CollectionToolbar__Group at >=641px (theme.scss.liquid ~7090); neutralise
+   it and keep the group full width so the two items stay 50/50. */
+@media screen and (min-width: 641px) {
+  .CollectionToolbar__Group {
+    -ms-flex: 1 0 auto;
+    flex: 1 0 auto;
+    -ms-flex-direction: row;
+    flex-direction: row;
+  }
+  .CollectionToolbar__Group .CollectionToolbar__Item:first-child {
+    border-left: none;
+  }
+}
+
+/* Tag labels: "-" already swapped for " " in Liquid; capitalise each word here
+   (Liquid has no per-word filter). Scoped to the filter popover only. */
+#collection-filter-popover .Popover__Value {
+  text-transform: capitalize;
+}
+
+/* ---------- Collection popovers: desktop placement ------------ */
+/* Lap-and-up only. The theme keeps .Popover position: fixed here (theme.scss.liquid
+   ~5246) and ab-collection-filter.js now sets only `top`, so we own the horizontal
+   placement. Centre each popover under its half of the toolbar. `right: auto` is
+   !important to beat any inline right the activator JS might set. */
+@media screen and (min-width: 1008px) {
+  #collection-filter-popover {
+    left: 25%;
+    right: auto !important;
+    transform: translateX(-50%);
+  }
+  #collection-sort-popover {
+    left: 75%;
+    right: auto !important;
+    transform: translateX(-50%);
+  }
+
+  /* Theme arrow (theme.scss.liquid ~5341):
+       .Popover::before { content:''; position:absolute; right:40px; width:10px; height:10px; border-style:solid; }
+       .Popover--positionBottom::before { bottom:100%; border-width:0 10px 10px 10px; ... }
+     Re-centre the arrow (width 10px → offset half = 5px). */
+  #collection-filter-popover::before,
+  #collection-sort-popover::before {
+    left: 50%;
+    right: auto;
+    margin-left: -5px;
+  }
+
+  #collection-filter-popover .Popover__ValueList,
+  #collection-sort-popover .Popover__ValueList {
+    max-height: min(60vh, 420px);
+    overflow-y: auto;
+
+    scrollbar-width: thin;
+    scrollbar-color: #5C4636 #33251C;
+  }
+
+  #collection-filter-popover .Popover__Value,
+  #collection-sort-popover .Popover__Value {
+    text-align: center;
+  }
+
+  #collection-filter-popover .Popover__ValueList::-webkit-scrollbar,
+  #collection-sort-popover .Popover__ValueList::-webkit-scrollbar {
+    width: 6px;
+  }
+  #collection-filter-popover .Popover__ValueList::-webkit-scrollbar-track,
+  #collection-sort-popover .Popover__ValueList::-webkit-scrollbar-track {
+    background: #33251C;
+  }
+  #collection-filter-popover .Popover__ValueList::-webkit-scrollbar-thumb,
+  #collection-sort-popover .Popover__ValueList::-webkit-scrollbar-thumb {
+    background: #5C4636;
+    border-radius: 3px;
+  }
+}
+
+/* ---------- Collection infinite scroll ----------------------- */
+/* Pagination kept in the DOM for SEO / no-JS; JS hides it visually. */
+.ab-is-pagination-hidden { display: none !important; }
+
+.ab-is-sentinel { width: 100%; height: 1px; }
+
+.ab-is-loader {
+  display: none;
+  width: 100%;
+  padding: 24px 0 40px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #B5A493;            /* Sand */
+}
+.ab-is-loader.is-visible { display: block; }
+
+/* ---------- Collection grid reveal --------------------------- */
+/* We own the reveal for the whole collection grid (page one + infinite-scroll
+   appends) instead of the theme's scroll-gated GSAP, which left cells it never
+   tweened stuck at the pre-hide `.js .ProductList--grid .ProductItem
+   { visibility: hidden }` (theme.scss.liquid:7150). !important is required to beat
+   that pre-hide AND GSAP's inline autoAlpha styles; scoped to the collection grid. */
+.CollectionInner__Products .ProductItem {
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* Page one (server-rendered cells, no .ab-in): pure-CSS staggered fade. No JS
+   gating, so nothing can get stuck hidden. Stagger the first 16 by source order. */
+.CollectionInner__Products .Grid__Cell:not(.ab-in) {
+  animation: ab-reveal 0.6s ease-out both;
+}
+.CollectionInner__Products .Grid__Cell:nth-child(1)  { animation-delay: 0ms; }
+.CollectionInner__Products .Grid__Cell:nth-child(2)  { animation-delay: 60ms; }
+.CollectionInner__Products .Grid__Cell:nth-child(3)  { animation-delay: 120ms; }
+.CollectionInner__Products .Grid__Cell:nth-child(4)  { animation-delay: 180ms; }
+.CollectionInner__Products .Grid__Cell:nth-child(5)  { animation-delay: 240ms; }
+.CollectionInner__Products .Grid__Cell:nth-child(6)  { animation-delay: 300ms; }
+.CollectionInner__Products .Grid__Cell:nth-child(7)  { animation-delay: 360ms; }
+.CollectionInner__Products .Grid__Cell:nth-child(8)  { animation-delay: 420ms; }
+.CollectionInner__Products .Grid__Cell:nth-child(9)  { animation-delay: 480ms; }
+.CollectionInner__Products .Grid__Cell:nth-child(10) { animation-delay: 540ms; }
+.CollectionInner__Products .Grid__Cell:nth-child(11) { animation-delay: 600ms; }
+.CollectionInner__Products .Grid__Cell:nth-child(12) { animation-delay: 660ms; }
+.CollectionInner__Products .Grid__Cell:nth-child(13) { animation-delay: 720ms; }
+.CollectionInner__Products .Grid__Cell:nth-child(14) { animation-delay: 780ms; }
+.CollectionInner__Products .Grid__Cell:nth-child(15) { animation-delay: 840ms; }
+.CollectionInner__Products .Grid__Cell:nth-child(16) { animation-delay: 900ms; }
+
+/* Appended cells (JS adds .ab-in + --ab-i per batch): same fade, batch-staggered. */
+.CollectionInner__Products .Grid__Cell.ab-in {
+  animation: ab-reveal 0.6s ease-out both;
+  animation-delay: calc(var(--ab-i, 0) * 60ms);
+}
+
+@keyframes ab-reveal {
+  from { opacity: 0; transform: translateY(25px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .CollectionInner__Products .Grid__Cell:not(.ab-in),
+  .CollectionInner__Products .Grid__Cell.ab-in {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}

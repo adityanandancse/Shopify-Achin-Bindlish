@@ -177,11 +177,12 @@
             {%- if show_filters or section.settings.show_sort_by -%}
               <div class="CollectionToolbar__Group">
                 {%- if show_filters -%}
-                  <button class="CollectionToolbar__Item CollectionToolbar__Item--filter Heading {% unless current_tags %}Text--subdued{% endunless %} u-h6 {% if section.settings.filter_position != 'drawer' %}hidden-lap-and-up{% endif %}"
-                          data-action="open-drawer"
-                          data-drawer-id="collection-filter-drawer"
-                          aria-label="{{ 'collection.filter.show_filter' | t }}">
-                    {{ 'collection.filter.title' | t }} {% if current_tags %}<span class="Text--subdued">({{ current_tags.size }})</span>{% endif %}
+                  <button class="CollectionToolbar__Item CollectionToolbar__Item--filter Heading Text--subdued u-h6"
+                          aria-label="{{ 'collection.filter.show_filter' | t }}"
+                          aria-haspopup="true"
+                          aria-expanded="false"
+                          aria-controls="collection-filter-popover">
+                    {{ 'collection.filter.title' | t }} {% if current_tags %}<span class="Text--subdued">({{ current_tags.size }})</span>{% endif %} {% include 'icon' with 'select-arrow' %}
                   </button>
                 {%- endif -%}
 
@@ -337,6 +338,10 @@
           {%- endif -%}
         {%- endcapture -%}
 
+        {%- comment -%}
+        AB: filter drawer disabled — filters now live in #collection-filter-popover (below).
+        Kept for reference; do not render.
+
         <div id="collection-filter-drawer" class="CollectionFilters Drawer Drawer--secondary Drawer--fromRight" aria-hidden="true">
           <header class="Drawer__Header Drawer__Header--bordered Drawer__Header--center Drawer__Container">
             <span class="Drawer__Title Heading u-h4">{{ 'collection.filter.all' | t }}</span>
@@ -359,6 +364,7 @@
             </div>
           </div>
         </div>
+        {%- endcomment -%}
       {%- endif -%}
 
       {%- if section.settings.show_sort_by -%}
@@ -384,6 +390,33 @@
         </div>
       {%- endif -%}
 
+      {%- if show_filters -%}
+        <div id="collection-filter-popover" class="Popover" aria-hidden="true">
+          <header class="Popover__Header">
+            <button class="Popover__Close Icon-Wrapper--clickable" data-action="close-popover">{% include 'icon' with 'close' %}</button>
+            <span class="Popover__Title Heading u-h4">{{ 'collection.filter.title' | t }}</span>
+          </header>
+
+          <div class="Popover__Content">
+            <div class="Popover__ValueList" data-scrollable>
+              <a href="{{ collection.url }}" class="Popover__Value {% if current_tags == blank %}is-selected{% endif %} Heading Link Link--primary u-h6">
+                {{- 'collection.filter.all' | t -}}
+              </a>
+
+              {%- for tag in collection.all_tags -%}
+                {%- if tag contains '__' -%}
+                  {%- continue -%}
+                {%- endif -%}
+
+                <a href="{{ collection.url }}/{{ tag | handle }}" class="Popover__Value {% if current_tags contains tag %}is-selected{% endif %} Heading Link Link--primary u-h6">
+                  {{- tag | replace: '-', ' ' -}}
+                </a>
+              {%- endfor -%}
+            </div>
+          </div>
+        </div>
+      {%- endif -%}
+
       {%- comment -%}
       --------------------------------------------------------------------------------------------------------------------
       COLLECTION PRODUCTS
@@ -396,6 +429,10 @@
         {%- endif -%}
 
         <div class="CollectionInner">
+          {%- comment -%}
+          AB: sidebar filters disabled — filters now live in #collection-filter-popover.
+          Kept for reference; do not render.
+
           {%- if show_filters and section.settings.filter_position == 'sidebar' -%}
             <div class="CollectionInner__Sidebar {% if collection_toolbar != blank and section.settings.toolbar_position == 'top' %}CollectionInner__Sidebar--withTopToolbar{% endif %} hidden-pocket">
               <div class="CollectionFilters">
@@ -405,6 +442,7 @@
               </div>
             </div>
           {%- endif -%}
+          {%- endcomment -%}
 
           <div class="CollectionInner__Products">
             {{ collection_inner }}
@@ -424,6 +462,9 @@
       </div>
     {%- endif -%}
   </section>
+
+  <script src="{{ 'ab-collection-filter.js' | asset_url }}" defer></script>
+  <script src="{{ 'ab-infinite-scroll.js' | asset_url }}" defer></script>
 {%- endif -%}
 
 {%- capture hack -%}
