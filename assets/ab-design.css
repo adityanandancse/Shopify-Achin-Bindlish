@@ -1,5 +1,6 @@
 /* Achin Bindlish — overrides of Prestige core (plain CSS, loaded after theme.scss.css) */
 
+.Select option,
 select option {
   background-color: #33251C;
   color: #FFF6E4;
