@@ -1,0 +1,73 @@
+<div class="Measure">
+
+  <div class="Container">
+    <header class="Measure__Header">
+      <span class="Measure__Eyebrow">Fit</span>
+      <h1 class="Measure__Title u-h1">{{ page.title }}</h1>
+    </header>
+
+    <div class="Measure__Body Rte">
+      {{ page.content }}
+    </div>
+
+    <div class="Measure__Cta">
+      <a href="/collections/all" class="Button Button--primary">See the pieces</a>
+      <a href="/pages/size-chart" class="Button Button--secondary">Size chart</a>
+    </div>
+  </div>
+
+</div>
+
+<style>
+  .Measure__Header {
+    max-width: 720px;
+    margin: 64px auto 32px;
+    text-align: center;
+  }
+
+  .Measure__Eyebrow {
+    display: block;
+    font-size: 10.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #7A6A5C;
+    margin-bottom: 16px;
+  }
+
+  .Measure__Title {
+    margin: 0;
+  }
+
+  .Measure__Body {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .Measure__Body h3 {
+    margin-top: 56px;
+    margin-bottom: 16px;
+  }
+
+  .Measure__Body p {
+    line-height: 1.7;
+  }
+
+  .Measure__Cta {
+    max-width: 720px;
+    margin: 56px auto 96px;
+    display: flex;
+    gap: 16px;
+  }
+
+  .Measure__Cta .Button {
+    flex: 1;
+  }
+
+  @media (max-width: 640px) {
+    .Measure__Header { margin: 40px auto 24px; }
+    .Measure__Cta {
+      flex-direction: column;
+      margin-bottom: 64px;
+    }
+  }
+</style>

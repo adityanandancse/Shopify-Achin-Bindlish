@@ -1,0 +1,77 @@
+{%- assign img_1 = page.metafields.atelier.image_1 -%}
+
+<div class="Atelier">
+
+  <section class="Atelier__Hero">
+    {%- if section != blank -%}{%- endif -%}
+    <div class="Atelier__HeroMedia">
+      {%- assign hero = 'atelier-hero.jpg' | asset_img_url: '2000x' -%}
+      <img src="{{ hero }}" alt="The Achin Bindlish atelier, Defence Colony, New Delhi" width="2000" height="1250" loading="eager">
+    </div>
+  </section>
+
+  <div class="Container">
+    <header class="Atelier__Header">
+      <span class="Atelier__Eyebrow">The Atelier</span>
+      <h1 class="Atelier__Title u-h1">{{ page.title }}</h1>
+    </header>
+
+    <div class="Atelier__Body Rte">
+      {{ page.content }}
+    </div>
+  </div>
+
+</div>
+
+<style>
+  .Atelier__HeroMedia img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .Atelier__Header {
+    max-width: 720px;
+    margin: 64px auto 32px;
+    text-align: center;
+  }
+
+  .Atelier__Eyebrow {
+    display: block;
+    font-size: 10.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #7A6A5C;
+    margin-bottom: 16px;
+  }
+
+  .Atelier__Title {
+    margin: 0;
+  }
+
+  .Atelier__Body {
+    max-width: 720px;
+    margin: 0 auto 96px;
+  }
+
+  .Atelier__Body h3 {
+    margin-top: 56px;
+    margin-bottom: 16px;
+  }
+
+  .Atelier__Body p {
+    line-height: 1.7;
+  }
+
+  .Atelier__Body img {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 48px 0;
+  }
+
+  @media (max-width: 640px) {
+    .Atelier__Header { margin: 40px auto 24px; }
+    .Atelier__Body { margin-bottom: 64px; }
+  }
+</style>

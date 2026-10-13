@@ -1,0 +1,170 @@
+{%- comment -%} Edit labels and copy here — one place. {%- endcomment -%}
+{%- assign cs_fields = 'Shoulder,Upper Bust,Bust,Under Bust,Armhole,Sleeve Length,Bicep,Elbow,Waist,Low Waist,Hip,Dress Length,Bottom Length (with heels),Kurta Length (with heels),Crotch Length,Thigh Circumference,Knee Circumference,Calf Circumference,Ankle Circumference' | split: ',' -%}
+{%- assign cs_standard_label = 'Standard size' -%}
+{%- assign cs_custom_label = 'Custom size' -%}
+{%- assign cs_modal_title = 'Your measurements' -%}
+{%- assign cs_modal_intro = 'All measurements in inches. Leave blank anything you are unsure of — our atelier will confirm with you.' -%}
+{%- assign cs_save_text = 'Save measurements' -%}
+{%- assign cs_cancel_text = 'Cancel' -%}
+{%- assign cs_edit_text = 'Edit measurements' -%}
+
+<div class="CustomSize" data-custom-size>
+    <div class="CustomSize__Head">
+    <span class="CustomSize__Legend">Fit</span>
+  </div>
+
+  <div class="CustomSize__Options" role="radiogroup" aria-label="Fit">
+    <label class="CustomSize__Option">
+      <input type="radio" name="cs-fit" value="standard" checked data-cs-standard>
+      <span class="CustomSize__OptionInner">{{ cs_standard_label }}</span>
+    </label>
+    <label class="CustomSize__Option">
+      <input type="radio" name="cs-fit" value="custom" data-cs-custom>
+      <span class="CustomSize__OptionInner">{{ cs_custom_label }}</span>
+    </label>
+  </div>
+
+  <p class="CustomSize__Hint Text--subdued">Made to your measurements at no extra cost.</p>
+
+  <div class="CustomSize__Summary" data-cs-summary hidden>
+    <ul class="CustomSize__SummaryList" data-cs-summary-list></ul>
+    <button type="button" class="CustomSize__Edit" data-cs-edit>{{ cs_edit_text }}</button>
+  </div>
+
+  <div class="CustomSize__Modal" data-cs-modal hidden>
+    <div class="CustomSize__ModalInner">
+      <button type="button" class="CustomSize__Close" data-cs-close aria-label="Close">&times;</button>
+      <h3 class="CustomSize__Title u-h5">{{ cs_modal_title }}</h3>
+      <p class="CustomSize__Intro Text--subdued">{{ cs_modal_intro }}</p>
+
+      <div class="CustomSize__Fields">
+        {%- for field in cs_fields -%}
+          {%- assign f = field | strip -%}
+          <div class="CustomSize__Field">
+            <label class="CustomSize__Label">{{ f }}</label>
+            <input type="number" step="0.25" min="0" inputmode="decimal"
+                   class="CustomSize__Input" data-cs-field="{{ f | escape }}" placeholder="in">
+          </div>
+        {%- endfor -%}
+      </div>
+
+      <div class="CustomSize__Actions">
+        <button type="button" class="Button Button--secondary" data-cs-cancel>{{ cs_cancel_text }}</button>
+        <button type="button" class="Button Button--primary" data-cs-save>{{ cs_save_text }}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  if (!root || !root.hasAttribute('data-custom-size')) {
+    root = document.querySelector('[data-custom-size]');
+  }
+  if (!root) return;
+
+    var form      = root.closest('form[action*="/cart/add"]')
+                  || document.querySelector('form[action*="/contact"]');
+  var isEnquiry = !!(form && form.action.indexOf('/contact') !== -1);
+  var modal     = root.querySelector('[data-cs-modal]');
+  var summary   = root.querySelector('[data-cs-summary]');
+  var list      = root.querySelector('[data-cs-summary-list]');
+  var inputs    = root.querySelectorAll('[data-cs-field]');
+  var radioStd  = root.querySelector('[data-cs-standard]');
+  var radioCst  = root.querySelector('[data-cs-custom]');
+  var STORAGE   = 'ab_custom_size';
+  var saved     = {};
+
+  try { saved = JSON.parse(localStorage.getItem(STORAGE) || '{}'); } catch (e) { saved = {}; }
+
+  function openModal() {
+    inputs.forEach(function (i) {
+      var k = i.getAttribute('data-cs-field');
+      if (saved[k]) i.value = saved[k];
+    });
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    modal.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  function clearInjected() {
+    if (!form) return;
+    form.querySelectorAll('.CustomSize__Property').forEach(function (n) { n.remove(); });
+  }
+
+  function inject(values) {
+    if (!form) return;
+    clearInjected();
+
+    var flag = document.createElement('input');
+    flag.type = 'hidden';
+    flag.className = 'CustomSize__Property';
+    flag.name = isEnquiry ? 'contact[Custom Size]' : 'properties[_Custom Size]';
+    flag.value = 'true';
+    form.appendChild(flag);
+
+    Object.keys(values).forEach(function (k) {
+      var input = document.createElement('input');
+      input.type = 'hidden';
+      input.className = 'CustomSize__Property';
+            input.name = isEnquiry ? 'contact[' + k + ']' : 'properties[' + k + ']';
+      input.value = values[k];
+      form.appendChild(input);
+    });
+  }
+
+  function renderSummary(values) {
+    list.innerHTML = '';
+    Object.keys(values).forEach(function (k) {
+      var li = document.createElement('li');
+      li.className = 'CustomSize__SummaryItem';
+      li.innerHTML = '<span>' + k + '</span><span>' + values[k] + '"</span>';
+      list.appendChild(li);
+    });
+    summary.hidden = Object.keys(values).length === 0;
+  }
+
+  function save() {
+    var values = {};
+    inputs.forEach(function (i) {
+      var v = i.value.trim();
+      if (v !== '') values[i.getAttribute('data-cs-field')] = v;
+    });
+
+    if (Object.keys(values).length === 0) {
+      radioStd.checked = true;
+      clearInjected();
+      summary.hidden = true;
+      closeModal();
+      return;
+    }
+
+    saved = values;
+    try { localStorage.setItem(STORAGE, JSON.stringify(values)); } catch (e) {}
+    inject(values);
+    renderSummary(values);
+    closeModal();
+  }
+
+  radioCst.addEventListener('change', function () { if (radioCst.checked) openModal(); });
+  radioStd.addEventListener('change', function () {
+    if (radioStd.checked) { clearInjected(); summary.hidden = true; }
+  });
+
+  root.querySelector('[data-cs-edit]').addEventListener('click', openModal);
+  root.querySelector('[data-cs-close]').addEventListener('click', closeModal);
+  root.querySelector('[data-cs-cancel]').addEventListener('click', function () {
+    if (Object.keys(saved).length === 0) radioStd.checked = true;
+    closeModal();
+  });
+  root.querySelector('[data-cs-save]').addEventListener('click', save);
+
+  modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
+})();
+</script>
