@@ -26,27 +26,31 @@
       {%- capture wa_href -%}{% render 'whatsapp-link' %}{%- endcapture -%}
     {%- endif -%}
 
-    {%- if form.posted_successfully? -%}
-      <div class="Rte" id="BookFitting-success-{{ section.id }}" tabindex="-1">
-        {%- if section.settings.success_heading != blank -%}
-          <h2 class="Heading u-h3">{{ section.settings.success_heading | escape }}</h2>
-        {%- endif -%}
-        {%- if section.settings.success_text != blank -%}
-          {{ section.settings.success_text }}
-        {%- endif -%}
-        {%- if wa_href != blank -%}
-          <p>
-            <a href="{{ wa_href | strip }}" target="_blank" rel="noopener" class="Button Button--secondary">
-              Message us on WhatsApp
-            </a>
-          </p>
-        {%- endif -%}
-      </div>
-    {%- else -%}
-      <div class="Rte">
-        {%- form 'contact', class: 'Form Form--spacingTight', data-book-fitting: section.id -%}
+    {%- comment -%} Success markup — reused by the server-rendered branch and the JS fallback target. {%- endcomment -%}
+    {%- capture success_html -%}
+      {%- if section.settings.success_heading != blank -%}
+        <h2 class="Heading u-h3" data-bf-success-heading tabindex="-1">{{ section.settings.success_heading | escape }}</h2>
+      {%- endif -%}
+      {%- if section.settings.success_text != blank -%}
+        {{ section.settings.success_text }}
+      {%- endif -%}
+      {%- if wa_href != blank -%}
+        <p>
+          <a href="{{ wa_href | strip }}" target="_blank" rel="noopener" class="Button Button--secondary">
+            Message us on WhatsApp
+          </a>
+        </p>
+      {%- endif -%}
+    {%- endcapture -%}
+
+    <div class="Rte">
+      {%- comment -%} form object only exists inside this block — the posted/error branch must live here. {%- endcomment -%}
+      {%- form 'contact', id: 'BookFittingForm', return_to: request.path, class: 'Form Form--spacingTight', data-book-fitting: section.id -%}
+        {%- if form.posted_successfully? -%}
+          <div class="Rte" id="BookFitting-success-{{ section.id }}" data-bf-success>{{ success_html }}</div>
+        {%- else -%}
           {%- if form.errors -%}
-            <div class="Form__Alert Alert Alert--error" role="alert">
+            <div class="Form__Alert Alert Alert--error" role="alert" data-bf-errors>
               <ul class="Alert__ErrorList">
                 {%- for field in form.errors -%}
                   {%- if field == 'form' -%}
@@ -59,6 +63,10 @@
             </div>
           {%- endif -%}
 
+          {%- comment -%} Pre-rendered hidden success block for the JS fallback (contact_posted=true but server branch didn't render). {%- endcomment -%}
+          <div class="Rte" id="BookFitting-success-{{ section.id }}" data-bf-success hidden>{{ success_html }}</div>
+
+          <div data-bf-fields>
           <input type="hidden" name="contact[Source]" value="Book a fitting – {{ page.url }}">
 
           <div class="Form__Group">
@@ -205,9 +213,10 @@
           </div>
 
           <button type="submit" class="Form__Submit Button Button--primary Button--full">Request a fitting</button>
-        {%- endform -%}
-      </div>
-    {%- endif -%}
+          </div>
+        {%- endif -%}
+      {%- endform -%}
+    </div>
   </div>
 </div>
 
@@ -261,13 +270,31 @@
   (function () {
     var STORAGE_KEY = 'book-fitting-{{ section.id }}';
 
-    {%- if form.posted_successfully? -%}
-    // Submission succeeded — discard any values preserved for the error reload.
-    try { sessionStorage.removeItem(STORAGE_KEY); } catch (e) {}
-    {%- endif -%}
-
     var form = document.querySelector('[data-book-fitting="{{ section.id }}"]');
     if (!form) return;
+
+    // Success / error state is read from the DOM + URL (the form object does not
+    // exist in this script's scope, so Liquid form.* checks can't be used here).
+    var successEl = form.querySelector('[data-bf-success]');
+    var fieldsEl = form.querySelector('[data-bf-fields]');
+    var postedUrl = /[?&]contact_posted=true/.test(window.location.search);
+    var isSuccess = !!(successEl && (!successEl.hasAttribute('hidden') || postedUrl));
+
+    if (isSuccess) {
+      // Clear the preserved field cache and reveal the success state.
+      try { sessionStorage.removeItem(STORAGE_KEY); } catch (e) {}
+      if (successEl.hasAttribute('hidden')) successEl.removeAttribute('hidden');
+      if (fieldsEl) fieldsEl.hidden = true;
+
+      var heading = successEl.querySelector('[data-bf-success-heading]') || successEl;
+      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      try { successEl.scrollIntoView({ block: 'start', behavior: reduceMotion ? 'auto' : 'smooth' }); }
+      catch (e) { successEl.scrollIntoView(); }
+      if (heading && heading.focus) heading.focus();
+      return;
+    }
+
+    var hasErrors = !!form.querySelector('[data-bf-errors]');
 
     // 1. Minimum date = today (local), for every date input.
     var today = new Date();
@@ -315,37 +342,37 @@
       try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
     }
 
-    {%- if form.errors -%}
-    try {
-      var saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || '{}');
-      fields().forEach(function (el) {
-        if (!el.name || !(el.name in saved)) return;
-        if (el.type === 'radio') {
-          el.checked = (el.value === saved[el.name]);
-        } else if (!el.value) {
-          el.value = saved[el.name];
-        }
-      });
-      // Values are back in the fields — drop the stored copy right away.
-      sessionStorage.removeItem(STORAGE_KEY);
-    } catch (e) {}
-    {%- endif -%}
+    if (hasErrors) {
+      try {
+        var saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || '{}');
+        fields().forEach(function (el) {
+          if (!el.name || !(el.name in saved)) return;
+          if (el.type === 'radio') {
+            el.checked = (el.value === saved[el.name]);
+          } else if (!el.value) {
+            el.value = saved[el.name];
+          }
+        });
+        // Values are back in the fields — drop the stored copy right away.
+        sessionStorage.removeItem(STORAGE_KEY);
+      } catch (e) {}
+    }
 
     form.addEventListener('input', save);
     form.addEventListener('change', save);
 
     // 4. On error, focus the first invalid / empty required field.
-    {%- if form.errors -%}
-    var firstInvalid = null;
-    form.querySelectorAll('[required]').forEach(function (el) {
-      if (firstInvalid) return;
-      var ok = el.type === 'radio'
-        ? form.querySelector('input[name="' + el.name.replace(/"/g, '\\"') + '"]:checked')
-        : el.value.trim();
-      if (!ok) firstInvalid = el;
-    });
-    (firstInvalid || form.querySelector('input, select, textarea')).focus();
-    {%- endif -%}
+    if (hasErrors) {
+      var firstInvalid = null;
+      form.querySelectorAll('[required]').forEach(function (el) {
+        if (firstInvalid) return;
+        var ok = el.type === 'radio'
+          ? form.querySelector('input[name="' + el.name.replace(/"/g, '\\"') + '"]:checked')
+          : el.value.trim();
+        if (!ok) firstInvalid = el;
+      });
+      (firstInvalid || form.querySelector('input, select, textarea')).focus();
+    }
 
     sync();
   })();
