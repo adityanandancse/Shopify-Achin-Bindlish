@@ -216,6 +216,10 @@
           {%- include 'product-form' -%}
           {%- include 'product-enquiry-form' -%}
 
+          {%- if section.settings.show_craft_notes -%}
+            {%- include 'craft-notes' -%}
+          {%- endif -%}
+
           {%- if section.settings.description_below_add_to_cart -%}
             <div class="ProductMeta__Description Rte">
               {{ product.description }}
@@ -419,6 +423,29 @@ This is the root container for the zoom functionality. Must not be removed, as o
       "label": "Show custom size option",
       "info": "Adds a \"Custom size\" tile beside the size options that opens the made-to-measure drawer. Requires a size option on the product.",
       "default": true
+    },
+    {
+      "type": "header",
+      "content": "Craft notes"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_craft_notes",
+      "label": "Show craft notes",
+      "info": "Displays story, technique, handwork, fabric, ready-in and care from the product's \"custom\" metafields, after add to cart.",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "craft_heading",
+      "label": "Craft notes heading",
+      "default": "The piece"
+    },
+    {
+      "type": "text",
+      "id": "care_label",
+      "label": "Care label",
+      "default": "Care"
     },
     {
       "type": "checkbox",
