@@ -40,7 +40,7 @@
   <p class="MtM__Summary Text--subdued" data-mtm-summary hidden></p>
 
   {%- comment -%} ---- Drawer ---- {%- endcomment -%}
-  <div class="Drawer Drawer--fromRight MtM__Drawer" id="mtm-drawer-{{ uid }}" data-mtm-drawer
+  <div class="MtM__Drawer" id="mtm-drawer-{{ uid }}" data-mtm-drawer
        role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="mtm-drawer-title-{{ uid }}">
     <div class="Drawer__Header Drawer__Header--bordered Drawer__Container">
       <span class="Drawer__Title Heading u-h4" id="mtm-drawer-title-{{ uid }}">Your measurements</span>
@@ -49,7 +49,7 @@
       </button>
     </div>
 
-      <div class="Drawer__Main MtM__Body" data-scrollable>
+      <div class="MtM__Body">
         <div class="Drawer__Container">
 
           <fieldset class="MtM__Fieldset MtM__ModeFieldset">
@@ -297,17 +297,30 @@
   /* Custom-size tile matches the theme's size tiles (styled via .SizeTile). */
   .SizeTile--custom[aria-pressed="true"] { }
 
-  /* Drawer: right side on desktop, bottom sheet on mobile.
-     Flex column so the body scrolls while header and footer stay put. */
+  /* Drawer: our own element (NOT the theme's .Drawer, so the theme's drawer JS
+     never manages it). Right side on desktop, bottom sheet on mobile. Flex column
+     so the body scrolls while header and footer stay put. */
   .MtM__Drawer {
+    position: fixed; top: 0; right: 0; left: auto;
     display: -webkit-box; display: -ms-flexbox; display: flex;
     -webkit-box-orient: vertical; -webkit-box-direction: normal;
     -ms-flex-direction: column; flex-direction: column;
     width: 460px; max-width: 100vw; height: 100%;
+    background: {{ settings.background }};
+    box-shadow: -2px 0 20px rgba(0, 0, 0, 0.18);
     overflow: hidden; z-index: 1001;
+    visibility: hidden;
     -webkit-transform: translateX(100%); transform: translateX(100%);
+    -webkit-transition: -webkit-transform 0.4s cubic-bezier(0.645, 0.045, 0.355, 1), visibility 0.4s;
+    transition: transform 0.4s cubic-bezier(0.645, 0.045, 0.355, 1), visibility 0.4s;
   }
-  .MtM__Drawer[aria-hidden="false"] { -webkit-transform: translateX(0); transform: translateX(0); }
+  .MtM__Drawer[aria-hidden="false"] {
+    visibility: visible;
+    -webkit-transform: translateX(0); transform: translateX(0);
+  }
+  /* Restore the bits the dropped .Drawer--fromRight used to provide. */
+  .MtM__Drawer .Drawer__Container { padding-left: 24px; padding-right: 18px; }
+  .MtM__Drawer .Drawer__Close { right: 18px; left: auto; }
   .MtM__Drawer .Drawer__Header { -ms-flex: none; flex: none; }
   .MtM__Body {
     -webkit-box-flex: 1; -ms-flex: 1 1 auto; flex: 1 1 auto;
@@ -315,6 +328,7 @@
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
+    touch-action: pan-y;
   }
   .MtM__Footer {
     -ms-flex: none; flex: none;
@@ -332,9 +346,9 @@
   @media (max-width: 767px) {
     .MtM__Drawer {
       width: 100%; max-width: none;
-      height: auto;
-      max-height: 90vh;  /* fallback for browsers without dvh */
-      max-height: 90dvh;
+      height: 85vh;   /* definite height fallback for browsers without dvh */
+      height: 85dvh;
+      max-height: none;
       top: auto; bottom: 0; right: 0; left: 0;
       -webkit-transform: translateY(100%); transform: translateY(100%);
     }
