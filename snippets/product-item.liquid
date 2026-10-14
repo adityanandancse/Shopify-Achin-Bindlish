@@ -76,6 +76,15 @@
       </div>
     </a>
 
+    {%- comment -%} Save-to-board heart (Phase 5a) — only where ab-board.js loads (product/collection/board), and never on the small horizontal card. {%- endcomment -%}
+    {%- assign ab_card_ok = false -%}
+    {%- if template.name == 'product' or template.name == 'collection' or template.suffix == 'my-board' -%}
+      {%- assign ab_card_ok = true -%}
+    {%- endif -%}
+    {%- if ab_card_ok and use_horizontal != true -%}
+      {%- include 'ab-save-button', context: 'card' -%}
+    {%- endif -%}
+
     {%- if show_labels -%}
       {%- capture product_labels -%}
         {%- for tag in product.tags -%}

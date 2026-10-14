@@ -159,5 +159,9 @@
 
 {% include 'card-hover-video' %}
 
+{%- if template.name == 'product' or template.name == 'collection' or template.suffix == 'my-board' -%}
+  {% include 'ab-board-runtime' %}
+{%- endif -%}
+
 </body>
 </html>

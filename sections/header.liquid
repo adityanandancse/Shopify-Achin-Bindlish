@@ -313,6 +313,13 @@ HEADER CONTENT
         </nav>
       {%- endunless -%}
 
+      <a href="/pages/my-board" class="Header__Icon Header__Icon--board Icon-Wrapper Icon-Wrapper--clickable" aria-label="My board">
+        <svg class="Icon Icon--board" viewBox="0 0 24 24" role="presentation" aria-hidden="true">
+          <path d="M12 20.5l-1.3-1.17C6.05 15.14 3 12.38 3 8.98 3 6.2 5.17 4 7.95 4c1.57 0 3.08.73 4.05 1.88C12.97 4.73 14.48 4 16.05 4 18.83 4 21 6.2 21 8.98c0 3.4-3.05 6.16-7.7 10.35L12 20.5z" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        </svg>
+        <span class="Header__BoardCount" data-ab-board-count hidden>0</span>
+      </a>
+
       <a href="/cart" class="Header__Icon Icon-Wrapper Icon-Wrapper--clickable {% unless use_sidebar_menu %}hidden-desk{% endunless %}" {% if settings.cart_type == 'drawer' %}data-action="open-drawer" data-drawer-id="sidebar-cart" aria-expanded="false" aria-label="{{ 'header.navigation.open_cart' | t }}"{% endif %}>
         <span class="hidden-tablet-and-up">{%- include 'icon' with 'cart' -%}</span>
         <span class="hidden-phone">{%- include 'icon' with 'cart-desktop' -%}</span>
@@ -354,6 +361,19 @@ HEADER CONTENT
       --header-is-transparent: 0;
     }
   {%- endif -%}
+
+  .Header__Icon--board { position: relative; display: inline-block; margin-left: 18px; vertical-align: middle; }
+  .Header__Icon--board .Icon--board { width: 21px; height: 21px; display: block; }
+  .Header__BoardCount {
+    position: absolute; top: -7px; right: -9px;
+    min-width: 16px; height: 16px; padding: 0 4px; box-sizing: border-box;
+    border-radius: 8px;
+    background: {{ settings.button_background | default: '#DBBF7C' }};
+    color: {{ settings.button_text_color | default: '#241A14' }};
+    font-size: 10px; line-height: 16px; text-align: center; font-weight: 700;
+    letter-spacing: 0;
+  }
+  .Header__BoardCount[hidden] { display: none; }
 </style>
 
 <script>

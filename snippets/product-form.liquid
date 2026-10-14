@@ -300,6 +300,11 @@ for size, we use it to display a size chart (if applicable)
       {{ form | payment_button }}
     {%- endif -%}
   {%- endif -%}
+
+  {%- comment -%} Save to personal board (Phase 5a) — quiet, directly under add to cart. {%- endcomment -%}
+  <div class="AbSave__Row">
+    {%- include 'ab-save-button', context: 'product' -%}
+  </div>
 {%- endform -%}
 {%- unless size_tiles_script_printed -%}
   {%- assign size_tiles_script_printed = true -%}

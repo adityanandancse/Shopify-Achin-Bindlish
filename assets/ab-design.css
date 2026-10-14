@@ -293,3 +293,153 @@ strong {
     animation: none;
   }
 }
+
+/* ============================================================================
+   Wedding board (Phase 5a) — save buttons, panel dialog, board page.
+   Palette mirrors the compiled theme tokens (bg #241A14, light #33251C,
+   text #FFF6E4, subdued #B5A493, accent #DBBF7C, border rgba ivory 0.15).
+   ========================================================================== */
+
+/* ---- Product-page inline save button ---- */
+.AbSave__Row { margin-top: 12px; text-align: center; }
+.AbSave--inline {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: none; border: 0; padding: 6px 4px; margin: 0;
+  font: inherit; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: #B5A493; cursor: pointer;
+}
+.AbSave--inline:hover { color: #FFF6E4; }
+.AbSave--inline .AbSave__Glyph { font-size: 15px; line-height: 1; letter-spacing: 0; }
+.AbSave--inline.is-saved { color: #DBBF7C; }
+.AbSave--inline:focus-visible { outline: 2px solid #DBBF7C; outline-offset: 2px; }
+.AbSave__Note { display: block; margin-top: 6px; font-size: 12px; }
+
+/* ---- Product-card corner heart ---- */
+.AbSave--card {
+  position: absolute; top: 10px; right: 10px; z-index: 3;
+  width: 36px; height: 36px; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 0; border-radius: 50%; cursor: pointer;
+  background: rgba(36, 26, 20, 0.55);
+  color: #FFF6E4;
+  opacity: 0;
+  transition: opacity 0.25s ease-in-out, background 0.2s ease;
+}
+.AbSave--card svg { width: 19px; height: 19px; display: block; fill: none; stroke: currentColor; stroke-width: 1.7; }
+.AbSave--card.is-saved { color: #DBBF7C; }
+.AbSave--card.is-saved svg { fill: #DBBF7C; stroke: #DBBF7C; }
+.AbSave--card:focus-visible { outline: 2px solid #DBBF7C; outline-offset: 2px; opacity: 1; }
+.ProductItem:hover .AbSave--card,
+.AbSave--card:focus-visible { opacity: 1; }
+/* Always visible on touch (no hover). */
+.no-supports-hover .AbSave--card { opacity: 1; }
+@media (hover: none), (pointer: coarse) { .AbSave--card { opacity: 1; } }
+
+/* ---- Save panel (dialog) + overlay ---- */
+.AbBoard__Overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(22, 16, 13, 0.6);
+  opacity: 0; transition: opacity 0.3s ease;
+}
+.AbBoard__Overlay.is-visible { opacity: 1; }
+.AbBoard__Panel {
+  position: fixed; z-index: 1001; right: 24px; bottom: 24px;
+  width: 380px; max-width: calc(100vw - 48px);
+  max-height: calc(100vh - 48px); overflow-y: auto;
+  background: #33251C; color: #FFF6E4;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  padding: 22px 22px 20px;
+  transform: translateY(12px); opacity: 0; visibility: hidden;
+  transition: transform 0.3s cubic-bezier(0.645,0.045,0.355,1), opacity 0.3s, visibility 0.3s;
+}
+.AbBoard__Panel.is-visible { transform: none; opacity: 1; visibility: visible; }
+.AbBoard__Head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.AbBoard__Title { margin: 0; }
+.AbBoard__Close {
+  background: none; border: 0; color: #B5A493; font-size: 24px; line-height: 1;
+  padding: 0 4px; cursor: pointer;
+}
+.AbBoard__Close:hover { color: #FFF6E4; }
+.AbBoard__Product { margin: 0 0 16px; font-size: 13px; }
+.AbBoard__Existing { margin: 0 0 18px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,246,228,0.15); }
+.AbBoard__EntryList { list-style: none; margin: 8px 0 0; padding: 0; }
+.AbBoard__Entry { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 5px 0; font-size: 13px; }
+.AbBoard__Remove { background: none; border: 0; padding: 0; font: inherit; font-size: 12px; color: #B5A493; cursor: pointer; }
+.AbBoard__Remove:hover { color: #FFF6E4; }
+.AbBoard__Field { border: 0; padding: 0; margin: 0 0 16px; }
+.AbBoard__Legend {
+  display: block; margin: 0 0 8px; padding: 0;
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #B5A493;
+}
+.AbBoard__Chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.AbBoard__Chip { position: relative; }
+.AbBoard__Chip input { position: absolute; opacity: 0; width: 0; height: 0; }
+.AbBoard__Chip span {
+  display: inline-block; padding: 7px 14px; cursor: pointer;
+  border: 1px solid rgba(255,246,228,0.25); border-radius: 999px;
+  font-size: 12px; letter-spacing: 0.04em;
+}
+.AbBoard__Chip input:checked + span { background: #DBBF7C; color: #241A14; border-color: #DBBF7C; }
+.AbBoard__Chip input:focus-visible + span { outline: 2px solid #DBBF7C; outline-offset: 2px; }
+.AbBoard__Input {
+  width: 100%; box-sizing: border-box; padding: 10px 12px;
+  background: #241A14; color: #FFF6E4;
+  border: 1px solid rgba(255,246,228,0.25); border-radius: 0;
+  font: inherit; font-size: 14px;
+}
+.AbBoard__Input:focus-visible { outline: 2px solid #DBBF7C; outline-offset: 1px; }
+.AbBoard__Names { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.AbBoard__NameChip {
+  background: none; border: 1px solid rgba(255,246,228,0.25); border-radius: 999px;
+  padding: 4px 10px; font: inherit; font-size: 12px; color: #B5A493; cursor: pointer;
+}
+.AbBoard__NameChip:hover { color: #FFF6E4; border-color: #FFF6E4; }
+.AbBoard__Actions { display: flex; gap: 10px; margin-top: 6px; }
+.AbBoard__Actions .Button { flex: 1; }
+
+@media (max-width: 600px) {
+  .AbBoard__Panel {
+    right: 0; left: 0; bottom: 0; width: 100%; max-width: none;
+    max-height: 85vh;
+    transform: translateY(100%);
+  }
+  .AbBoard__Panel.is-visible { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .AbBoard__Overlay, .AbBoard__Panel { transition: none; }
+}
+
+/* ---- Board page ---- */
+.MyBoard__Intro { max-width: 720px; margin: 0 auto 36px; text-align: center; }
+.MyBoard__Group { margin: 0 0 48px; }
+.MyBoard__GroupHeading {
+  font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: #B5A493;
+  margin: 0 0 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,246,228,0.15);
+}
+.MyBoard__Grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px 20px; }
+.MyBoard__Item { text-align: left; }
+.MyBoard__Thumb { display: block; width: 100%; height: auto; background: #241A14; margin-bottom: 10px; }
+.MyBoard__ItemTitle { display: block; font-size: 14px; margin: 0 0 6px; }
+.MyBoard__ItemTitle a { color: inherit; text-decoration: none; }
+.MyBoard__ItemTitle a:hover { text-decoration: underline; }
+.MyBoard__Who {
+  display: inline-block; margin: 0 0 8px; padding: 3px 10px;
+  border: 1px solid rgba(255,246,228,0.25); border-radius: 999px;
+  font-size: 11px; letter-spacing: 0.06em; color: #B5A493;
+}
+.MyBoard__Price { display: block; font-size: 13px; color: #B5A493; margin-bottom: 10px; }
+.MyBoard__ItemActions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-size: 12px; }
+.MyBoard__ItemActions .Select--board { position: relative; }
+.MyBoard__Select {
+  background: #241A14; color: #FFF6E4; border: 1px solid rgba(255,246,228,0.25);
+  padding: 5px 8px; font: inherit; font-size: 12px;
+}
+.MyBoard__Link { background: none; border: 0; padding: 0; font: inherit; font-size: 12px; color: #B5A493; cursor: pointer; text-decoration: underline; }
+.MyBoard__Link:hover { color: #FFF6E4; }
+.MyBoard__WhoEdit { width: 110px; background: #241A14; color: #FFF6E4; border: 1px solid rgba(255,246,228,0.25); padding: 4px 8px; font: inherit; font-size: 12px; }
+.MyBoard__Item--gone .MyBoard__Thumb { display: flex; align-items: center; justify-content: center; min-height: 160px; color: #B5A493; font-size: 13px; }
+.MyBoard__Empty { max-width: 620px; margin: 40px auto 80px; text-align: center; }
+.MyBoard__Empty p { color: #B5A493; }
+
+@media (max-width: 900px) { .MyBoard__Grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 640px) { .MyBoard__Grid { grid-template-columns: repeat(2, 1fr); gap: 22px 14px; } }

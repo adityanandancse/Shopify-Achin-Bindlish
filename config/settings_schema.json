@@ -700,5 +700,50 @@
         "info": "Optional. When set, each field shows a 'How to measure' link to this page plus #<key>. Leave empty to hide."
       }
     ]
+  },
+  {
+    "name": "My board",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Labels for the six board functions. Used by the save panel on product and collection pages."
+      },
+      {
+        "type": "text",
+        "id": "board_label_mehendi",
+        "label": "Mehendi label",
+        "default": "Mehendi"
+      },
+      {
+        "type": "text",
+        "id": "board_label_haldi",
+        "label": "Haldi label",
+        "default": "Haldi"
+      },
+      {
+        "type": "text",
+        "id": "board_label_sangeet",
+        "label": "Sangeet label",
+        "default": "Sangeet"
+      },
+      {
+        "type": "text",
+        "id": "board_label_wedding",
+        "label": "Wedding label",
+        "default": "Wedding"
+      },
+      {
+        "type": "text",
+        "id": "board_label_reception",
+        "label": "Reception label",
+        "default": "Reception"
+      },
+      {
+        "type": "text",
+        "id": "board_label_other",
+        "label": "Other label",
+        "default": "Other"
+      }
+    ]
   }
 ]
