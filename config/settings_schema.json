@@ -8,6 +8,18 @@
     "theme_support_email": "shopify-support@maestrooo.com"
   },
   {
+    "name": "Breadcrumbs",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "show_breadcrumbs",
+        "label": "Show breadcrumbs",
+        "info": "Shows a breadcrumb trail at the top of product, collection, page, blog and article templates.",
+        "default": true
+      }
+    ]
+  },
+  {
     "name": "Colors",
     "settings": [
       {
@@ -743,6 +755,135 @@
         "id": "board_label_other",
         "label": "Other label",
         "default": "Other"
+      }
+    ]
+  },
+  {
+    "name": "Business details",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Powers the structured data (JSON-LD) in the page head. All fields are optional unless noted; the store block only appears once a street address is set."
+      },
+      {
+        "type": "text",
+        "id": "brand_name",
+        "label": "Brand name",
+        "default": "Achin Bindlish"
+      },
+      {
+        "type": "text",
+        "id": "brand_alternate_name",
+        "label": "Alternate name",
+        "default": "AB"
+      },
+      {
+        "type": "image_picker",
+        "id": "brand_logo",
+        "label": "Logo",
+        "info": "Square or wide logo for search results. Falls back to the social share image if empty."
+      },
+      {
+        "type": "textarea",
+        "id": "brand_description",
+        "label": "Description",
+        "info": "Up to 300 characters.",
+        "default": "Couture, bespoke and ready-to-wear by Achin Bindlish."
+      },
+      {
+        "type": "text",
+        "id": "founding_year",
+        "label": "Founding year"
+      },
+      {
+        "type": "header",
+        "content": "Address"
+      },
+      {
+        "type": "text",
+        "id": "street_address",
+        "label": "Street address"
+      },
+      {
+        "type": "text",
+        "id": "locality",
+        "label": "City / locality"
+      },
+      {
+        "type": "text",
+        "id": "region",
+        "label": "State / region"
+      },
+      {
+        "type": "text",
+        "id": "postal_code",
+        "label": "Postal code"
+      },
+      {
+        "type": "text",
+        "id": "country_code",
+        "label": "Country code",
+        "info": "Two-letter ISO code.",
+        "default": "IN"
+      },
+      {
+        "type": "text",
+        "id": "latitude",
+        "label": "Latitude",
+        "info": "Optional."
+      },
+      {
+        "type": "text",
+        "id": "longitude",
+        "label": "Longitude",
+        "info": "Optional."
+      },
+      {
+        "type": "header",
+        "content": "Contact & hours"
+      },
+      {
+        "type": "text",
+        "id": "telephone",
+        "label": "Telephone",
+        "info": "In +country format, e.g. +918287222999.",
+        "default": "+918287222999"
+      },
+      {
+        "type": "textarea",
+        "id": "opening_hours",
+        "label": "Opening hours",
+        "info": "One rule per line, e.g. Mo-Sa 11:00-20:00."
+      },
+      {
+        "type": "text",
+        "id": "area_served",
+        "label": "Area served",
+        "info": "Comma-separated ISO country codes.",
+        "default": "IN, AE, US, JP, IT"
+      },
+      {
+        "type": "header",
+        "content": "Brand & policy"
+      },
+      {
+        "type": "textarea",
+        "id": "sub_brands",
+        "label": "Sub-brands",
+        "info": "One per line.",
+        "default": "AB Couture\nAB Bespoke\nAB & Beyond"
+      },
+      {
+        "type": "number",
+        "id": "return_days",
+        "label": "Return window (days)",
+        "info": "Optional. Leave empty if returns are not offered."
+      },
+      {
+        "type": "checkbox",
+        "id": "ships_internationally",
+        "label": "Ships internationally",
+        "default": true
       }
     ]
   }

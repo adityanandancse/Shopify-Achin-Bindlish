@@ -443,3 +443,79 @@ strong {
 
 @media (max-width: 900px) { .MyBoard__Grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 640px) { .MyBoard__Grid { grid-template-columns: repeat(2, 1fr); gap: 22px 14px; } }
+
+/* ============================================================
+   Location map (sections/ab-location.liquid)
+   Two columns tablet-and-up (text ~40 / map ~60), stacked on
+   mobile (text then map). Palette: Mocha #5C4636 (border),
+   Cacao #33251C (loading bg), Sand #B5A493 (text).
+   ============================================================ */
+
+/* Columns — stacked on mobile, text then map. */
+.AbLocation {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;                 /* stacked, mobile */
+}
+
+/* Map wrapper: ratio by class, Mocha border, Cacao bg while loading. */
+.AbLocation__Map {
+  position: relative;
+  border: 1px solid #5C4636; /* Mocha */
+  background: #33251C;       /* Cacao — shown until the iframe paints */
+  overflow: hidden;
+}
+
+.AbLocation__Map--16x10 { aspect-ratio: 16 / 10; }
+.AbLocation__Map--4x3   { aspect-ratio: 4 / 3; }
+.AbLocation__Map--1x1   { aspect-ratio: 1 / 1; }
+
+/* Iframe fills the wrapper, no border of its own. */
+.AbLocation__Frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Dark toning when the section opts in. */
+.AbLocation--darkMap .AbLocation__Frame {
+  filter: invert(90%) hue-rotate(180deg) sepia(20%) saturate(80%) brightness(95%);
+}
+
+/* Address / hours copy. */
+.AbLocation__Address,
+.AbLocation__Hours {
+  color: #B5A493;            /* Sand */
+  line-height: 1.7;
+}
+
+/* Primary button sits 32px below the copy. */
+.AbLocation__Directions {
+  margin-top: 32px;
+}
+
+/* Tablet-and-up: 40 / 60 split, 48px gutter. */
+@media screen and (min-width: 641px) {
+  .AbLocation {
+    flex-direction: row;
+    align-items: center;
+    gap: 48px;
+  }
+  .AbLocation__Info {
+    -ms-flex: 0 0 40%;
+    flex: 0 0 40%;
+    max-width: 40%;
+  }
+  .AbLocation__MapColumn {
+    -ms-flex: 1 1 60%;
+    flex: 1 1 60%;
+    max-width: 60%;
+  }
+  /* No map: let the text occupy the full row. */
+  .AbLocation--noMap .AbLocation__Info {
+    -ms-flex-preferred-size: 100%;
+    flex-basis: 100%;
+    max-width: 100%;
+  }
+}

@@ -1,91 +1,64 @@
 {%- comment -%}
-Add Facebook and Pinterest Open Graph meta tags to product pages
-for friendly Facebook sharing and Pinterest pinning.
-
-More info Open Graph meta tags
-- https://developers.facebook.com/docs/opengraph/using-objects/
-- https://developers.pinterest.com/rich_pins/
-
-Use the Facebook Open Graph Debugger for validation (and cache clearing)
-- http://developers.facebook.com/tools/debug
-
-Validate your Pinterest rich pins
-- https://developers.pinterest.com/rich_pins/validator/
+  Open Graph + Twitter social preview tags. One og:image (https, 1200w) with
+  width/height/alt; twitter card summary_large_image. Product price is emitted
+  only for products that are not tagged price-on-request.
 {%- endcomment -%}
 
+{%- comment -%} ---- Resolve type, image and copy per template ---- {%- endcomment -%}
+{%- assign og_type = 'website' -%}
+{%- assign og_image = settings.share_image -%}
+{%- assign og_title = page_title -%}
+{%- assign og_description = page_description | default: shop.description -%}
+
 {%- if template.name == 'product' -%}
-  <meta property="og:type" content="product">
-  <meta property="og:title" content="{{ product.title | strip_html | escape }}">
-
-  {%- for image in product.images limit:3 -%}
-    <meta property="og:image" content="http:{{ image.src | img_url: 'grande' }}">
-    <meta property="og:image:secure_url" content="https:{{ image.src | img_url: 'grande' }}">
-  {%- endfor -%}
-
-  <meta property="og:price:amount" content="{{ product.price | money_without_currency | strip_html | escape }}">
-  <meta property="og:price:currency" content="{{ shop.currency }}">
+  {%- assign og_type = 'product' -%}
+  {%- assign og_image = product.featured_image | default: settings.share_image -%}
+  {%- assign og_title = product.title -%}
+  {%- assign og_description = product.description | default: page_description | default: shop.description -%}
 {%- elsif template.name == 'article' -%}
-  <meta property="og:type" content="article">
-  <meta property="og:title" content="{{ article.title | strip_html | escape }}">
-
-  {%- if article.image -%}
-    <meta property="og:image" content="http:{{ article.image | img_url: 'grande' }}">
-    <meta property="og:image:secure_url" content="https:{{ article.image | img_url: 'grande' }}">
-  {%- endif -%}
+  {%- assign og_type = 'article' -%}
+  {%- assign og_image = article.image | default: settings.share_image -%}
+  {%- assign og_title = article.title -%}
+  {%- assign og_description = article.excerpt_or_content | default: page_description -%}
 {%- elsif template.name == 'collection' -%}
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="{{ collection.title | strip_html | escape }}">
-  <meta property="og:image" content="http:{{ collection.image | default: collection.products.first.featured_image | img_url: 'grande' }}">
-  <meta property="og:image:secure_url" content="https:{{ collection.image | default: collection.products.first.featured_image | img_url: 'grande' }}">
-{%- else -%}
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="{{ page_title | escape }}">
-
-  {%- if settings.share_image -%}
-    <meta property="og:image" content="http:{{ settings.share_image | img_url: 'grande' }}">
-    <meta property="og:image:secure_url" content="https:{{ settings.share_image | img_url: 'grande' }}">
-  {%- endif -%}
+  {%- assign og_image = collection.image | default: collection.products.first.featured_image | default: settings.share_image -%}
+  {%- assign og_title = collection.title -%}
+  {%- assign og_description = collection.description | default: page_description | default: shop.description -%}
 {%- endif -%}
 
-{%- if page_description -%}
-  <meta property="og:description" content="{{ page_description | escape }}">
-{%- endif -%}
-
+<meta property="og:site_name" content="{{ shop.name | escape }}">
 <meta property="og:url" content="{{ canonical_url }}">
-<meta property="og:site_name" content="{{ shop.name }}">
+<meta property="og:title" content="{{ og_title | strip_html | escape }}">
+<meta property="og:type" content="{{ og_type }}">
 
-{%- comment -%}
-This snippet renders meta data needed to create a Twitter card
-for products and articles.
+{%- if og_description != blank -%}
+  <meta property="og:description" content="{{ og_description | strip_html | strip_newlines | truncate: 200 | escape }}">
+{%- endif -%}
 
-Your cards must be approved by Twitter to be activated
-- https://dev.twitter.com/docs/cards/validation/validator
+{%- if og_image != blank -%}
+  {%- assign og_image_alt = og_image.alt | default: og_title | default: shop.name -%}
+  <meta property="og:image" content="https:{{ og_image | image_url: width: 1200 }}">
+  <meta property="og:image:secure_url" content="https:{{ og_image | image_url: width: 1200 }}">
+  <meta property="og:image:width" content="1200">
+  {%- if og_image.aspect_ratio > 0 -%}
+    <meta property="og:image:height" content="{{ 1200 | divided_by: og_image.aspect_ratio | round }}">
+  {%- endif -%}
+  <meta property="og:image:alt" content="{{ og_image_alt | strip_html | escape }}">
+{%- endif -%}
 
-More information:
-- https://dev.twitter.com/cards/types/summary
-{%- endcomment -%}
-
-<meta name="twitter:card" content="summary">
 {%- if template.name == 'product' -%}
-  <meta name="twitter:title" content="{{ product.title }}">
-  <meta name="twitter:description" content="{{ product.description | strip_html | truncatewords: 140, '' | escape }}">
-  <meta name="twitter:image" content="https:{{ product.featured_image.src | img_url: '600x600', crop: 'center' }}">
-{%- elsif template.name == 'article' -%}
-  <meta name="twitter:title" content="{{ article.title }}">
-  <meta name="twitter:description" content="{{ article.excerpt_or_content | strip_html | truncatewords: 140, '' | escape }}">
+  {%- assign por_tags = product.tags | join: ',' | downcase -%}
+  {%- unless por_tags contains 'price-on-request' -%}
+    <meta property="og:price:amount" content="{{ product.price | money_without_currency | strip_html | escape }}">
+    <meta property="og:price:currency" content="{{ shop.currency }}">
+  {%- endunless -%}
+{%- endif -%}
 
-  {%- if article.image -%}
-    <meta name="twitter:image" content="https:{{ article.image | img_url: '600x600', crop: 'center' }}">
-  {%- endif -%}
-{%- elsif template.name == 'collection' -%}
-  <meta name="twitter:title" content="{{ collection.title }}">
-  <meta name="twitter:description" content="{{ collection.description | strip_html | truncatewords: 140, '' | escape }}">
-  <meta name="twitter:image" content="https:{{ collection.image | default: collection.products.first.featured_image | img_url: '600x600', crop: 'center' }}">
-{%- else -%}
-  <meta name="twitter:title" content="{{ page_title | escape }}">
-  <meta name="twitter:description" content="{{ page_description | default: page_title | escape }}">
-
-  {%- if settings.share_image -%}
-    <meta name="twitter:image" content="https:{{ settings.share_image | img_url: '600x600', crop: 'center' }}">
-  {%- endif -%}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ og_title | strip_html | escape }}">
+{%- if og_description != blank -%}
+  <meta name="twitter:description" content="{{ og_description | strip_html | strip_newlines | truncate: 200 | escape }}">
+{%- endif -%}
+{%- if og_image != blank -%}
+  <meta name="twitter:image" content="https:{{ og_image | image_url: width: 1200 }}">
 {%- endif -%}
