@@ -83,7 +83,10 @@
                  data-widths="[{{ supported_sizes }}]"
                  data-sizes="auto"
                  data-expand="-100"
-                 alt="{{ image.alt | escape }}"
+                 width="{{ image.width }}"
+                 height="{{ image.height }}"
+                 alt="{{ image.alt | default: product.title | escape }}"
+                 {% if image_count == 0 %}fetchpriority="high"{% else %}loading="lazy"{% endif %}
                  data-max-width="{{ image.width }}"
                  data-max-height="{{ image.height }}"
                  data-original-src="{{ image | img_url: 'master' }}">
@@ -104,8 +107,17 @@
       {%- endfor -%}
     {%- endcapture -%}
 
-    {%- if product.images.size > 0 -%}
-      <div class="Product__Gallery {% if section.settings.show_thumbnails and image_count > 1 %}Product__Gallery--withThumbnails{% else %}Product__Gallery--withDots{% endif %}">
+    {%- comment -%} Native Shopify-hosted video media — appended as gallery cells (external video stays as the alt-tag flow above). {%- endcomment -%}
+    {%- assign gallery_videos = product.media | where: 'media_type', 'video' -%}
+    {%- capture slideshow_videos -%}
+      {%- for media in gallery_videos -%}
+        {%- include 'product-gallery-video' -%}
+      {%- endfor -%}
+    {%- endcapture -%}
+    {%- assign gallery_cell_count = image_count | plus: gallery_videos.size -%}
+
+    {%- if product.images.size > 0 or gallery_videos.size > 0 -%}
+      <div class="Product__Gallery {% if section.settings.show_thumbnails and gallery_cell_count > 1 %}Product__Gallery--withThumbnails{% else %}Product__Gallery--withDots{% endif %}">
         <span id="ProductGallery" class="Anchor"></span>
 
         {%- if action_list_items != blank -%}
@@ -114,7 +126,7 @@
           </div>
         {%- endif -%}
 
-        {%- if image_count > 1 -%}
+        {%- if gallery_cell_count > 1 -%}
           {%- if section.settings.show_thumbnails -%}
             <div class="Product__SlideshowNav Product__SlideshowNav--thumbnails">
               <div class="Product__SlideshowNavScroller">
@@ -137,6 +149,13 @@
                     {%- endif -%}
                   </a>
                 {%- endfor -%}
+
+                {%- for media in gallery_videos -%}
+                  <a href="#Media{{ media.id }}" class="Product__SlideshowNavImage Product__SlideshowNavImage--video AspectRatio {% if image_count == 0 and forloop.first %}is-selected{% endif %}" style="--aspect-ratio: {{ media.aspect_ratio }}">
+                    <img src="{{ media.preview_image | img_url: '160x' }}" alt="{{ media.alt | default: product.title | escape }}">
+                    <button type="button" class="Product__SlideshowNavPlay" data-action="play-video" aria-label="{{ 'home_page.featured_video.play' | t }}">{% include 'icon' with 'play' %}</button>
+                  </a>
+                {%- endfor -%}
               </div>
             </div>
           {%- endif -%}
@@ -150,6 +169,10 @@
 
                 <a href="#Image{{ image.id }}" class="Product__SlideshowNavDot {% if forloop.first %}is-selected{% endif %}"></a>
               {%- endfor -%}
+
+              {%- for media in gallery_videos -%}
+                <a href="#Media{{ media.id }}" class="Product__SlideshowNavDot {% if image_count == 0 and forloop.first %}is-selected{% endif %}"></a>
+              {%- endfor -%}
             </div>
           </div>
         {%- endif -%}
@@ -157,7 +180,7 @@
         {%- capture flickity_options -%}
         {
           "prevNextButtons": false,
-          "pageDots": {% if image_count > 1 %}true{% else %}false{% endif %},
+          "pageDots": {% if gallery_cell_count > 1 %}true{% else %}false{% endif %},
           "adaptiveHeight": true,
           "wrapAround": false,
           "watchCSS": true,
@@ -168,8 +191,11 @@
 
         <div class="Product__Slideshow {% if section.settings.enable_image_zoom %}Product__Slideshow--zoomable{% endif %} Carousel" data-flickity-config='{{ flickity_options }}'>
           {{ slideshow_images }}
+          {{ slideshow_videos }}
         </div>
       </div>
+
+      {%- include 'product-gallery-enhancements' -%}
     {%- endif -%}
 
     {%- capture product_aside -%}

@@ -342,10 +342,25 @@
         "default": false
       },
       {
-        "type": "checkbox",
-        "id": "product_show_secondary_image",
-        "label": "Show secondary image on hover",
-        "default": false
+        "type": "select",
+        "id": "card_hover",
+        "label": "Card hover",
+        "info": "Hover behaviour on product cards (desktop only). \"Video if available\" plays the product's first video muted, otherwise shows the second image.",
+        "options": [
+          {
+            "value": "none",
+            "label": "None"
+          },
+          {
+            "value": "second_image",
+            "label": "Second image"
+          },
+          {
+            "value": "video",
+            "label": "Video if available"
+          }
+        ],
+        "default": "video"
       },
       {
         "type": "select",

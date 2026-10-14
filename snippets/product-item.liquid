@@ -12,13 +12,24 @@
       {%- assign use_natural_size = false -%}
     {%- endif -%}
 
-    {%- if settings.product_show_secondary_image and product.images[1] != blank and use_horizontal != true -%}
+    {%- comment -%} Card hover (desktop only): video if available, else second image. {%- endcomment -%}
+    {%- assign card_hover = settings.card_hover | default: 'video' -%}
+    {%- assign hover_video = product.media | where: 'media_type', 'video' | first -%}
+
+    {%- assign has_hover_video = false -%}
+    {%- if card_hover == 'video' and hover_video != blank and use_horizontal != true -%}
+      {%- assign has_hover_video = true -%}
+    {%- endif -%}
+
+    {%- if has_hover_video -%}
+      {%- assign has_alternate_image = false -%}
+    {%- elsif card_hover != 'none' and product.images[1] != blank and use_horizontal != true -%}
       {%- assign has_alternate_image = true -%}
     {%- else -%}
       {%- assign has_alternate_image = false -%}
     {%- endif -%}
 
-    <a href="{{ product.url | within: collection }}" class="ProductItem__ImageWrapper {% if has_alternate_image %}ProductItem__ImageWrapper--withAlternateImage{% endif %}">
+    <a href="{{ product.url | within: collection }}" class="ProductItem__ImageWrapper {% if has_alternate_image %}ProductItem__ImageWrapper--withAlternateImage{% endif %} {% if has_hover_video %}ProductItem__ImageWrapper--withHoverVideo{% endif %}">
       {%- if use_horizontal -%}
         {%- assign max_width = 125 -%}
       {%- else -%}
@@ -41,8 +52,22 @@
         {%- include 'image-size', sizes: '200,400,600,700,800,900,1000,1200', image: product.featured_image -%}
         {%- assign image_url = product.featured_image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
 
-        <img class="ProductItem__Image Image--lazyLoad Image--fadeIn" data-src="{{ image_url }}" data-widths="[{{ supported_sizes }}]" data-sizes="auto" alt="{{ product.featured_image.alt | escape }}" data-image-id="{{ product.featured_image.id }}">
+        <img class="ProductItem__Image Image--lazyLoad Image--fadeIn" data-src="{{ image_url }}" data-widths="[{{ supported_sizes }}]" data-sizes="auto" width="{{ product.featured_image.width }}" height="{{ product.featured_image.height }}" alt="{{ product.featured_image.alt | default: product.title | escape }}" data-image-id="{{ product.featured_image.id }}">
         <span class="Image__Loader"></span>
+
+        {%- if has_hover_video -%}
+          {%- assign hv_poster = hover_video.preview_image -%}
+          <video class="ProductItem__HoverVideo" data-card-video muted loop playsinline preload="none"
+                 {% if hv_poster %}poster="{{ hv_poster | img_url: '600x' }}" width="{{ hv_poster.width }}" height="{{ hv_poster.height }}"{% endif %}
+                 aria-hidden="true" tabindex="-1">
+            {%- for source in hover_video.sources -%}
+              {%- if source.format == 'mp4' -%}<source src="{{ source.url }}" type="{{ source.mime_type }}">{%- endif -%}
+            {%- endfor -%}
+            {%- for source in hover_video.sources -%}
+              {%- unless source.format == 'mp4' -%}<source src="{{ source.url }}" type="{{ source.mime_type }}">{%- endunless -%}
+            {%- endfor -%}
+          </video>
+        {%- endif -%}
 
         <noscript>
           <img class="ProductItem__Image ProductItem__Image--alternate" src="{{ product.images[1] | img_url: '600x' }}" alt="{{ product.images[1].alt | escape }}">
